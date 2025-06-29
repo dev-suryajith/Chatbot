@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Application Management Dashboard">
+    <title>Application Management Dashboard</title>
+    {% load static %}
+<!--    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">-->
+    <link rel="stylesheet" href="{% static 'css/noUiSlider.css' %}">
+<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.css">-->
+    <script src="https://cdn.jsdelivr.net/npm/nouislider@14.6.3/distribute/nouislider.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.11.2/toastify.min.css">
+    <style>
+        /* Base Styles and Variables */
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2c3e50;
+  --success-color: #2ecc71;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #34495e;
+  --text-color: #333;
+  --border-radius: 5px;
+  --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fa;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header Styles */
+.dashboard-header {
+  background-color: white;
+  padding: 1rem 2rem;
+  box-shadow: var(--box-shadow);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+}
+
+.user-details {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.user-name {
+  font-weight: bold;
+}
+
+.user-role {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--border-radius);
+  font-size: 0.8rem;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.user-meta {
+  display: flex;
+  gap: 1rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+}
+
+/* Buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+.btn-secondary {
+  background-color: var(--light-color);
+  color: var(--dark-color);
+}
+
+.btn-secondary:hover {
+  background-color: #bdc3c7;
+}
+
+.btn-logout {
+  background-color: transparent;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+
+.btn-logout:hover {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* Main Content */
+.dashboard-main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Search Section */
+.search-section {
+  margin-bottom: 2rem;
+}
+
+.search-form {
+  width: 100%;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  padding: 0 1rem;
+  overflow: hidden;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.8rem 0.5rem;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+}
+
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  outline: none;
+  min-width: 150px;
+}
+
+/* Marks Range Slider */
+.marks-range-container {
+  flex: 1;
+  min-width: 200px;
+}
+
+.marks-label-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.marks-slider {
+  height: 5px;
+  background: #ddd;
+  border-radius: var(--border-radius);
+  position: relative;
+  margin: 1rem 0;
+}
+
+/* Notifications */
+.notifications-container {
+  margin-bottom: 1rem;
+}
+
+.notification {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: var(--border-radius);
+  background-color: var(--light-color);
+  border-left: 4px solid var(--primary-color);
+}
+
+.notification-success {
+  border-left-color: var(--success-color);
+}
+
+.notification-error {
+  border-left-color: var(--danger-color);
+}
+
+/* Applications Section */
+.section-title {
+  margin-bottom: 1.5rem;
+  color: var(--secondary-color);
+}
+
+.applications-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.application-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.application-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+.application-number {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--dark-color);
+}
+
+.status-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-Pending, .status-pending {
+  background-color: #f8f9fa;
+  color: var(--warning-color);
+  border: 1px solid var(--warning-color);
+}
+
+.status-Accepted, .status-accepted {
+  background-color: #f0fff4;
+  color: var(--success-color);
+  border: 1px solid var(--success-color);
+}
+
+.status-Rejected, .status-rejected {
+  background-color: #fff5f5;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+
+.card-content {
+  padding: 1rem;
+  flex: 1;
+}
+
+.applicant-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.detail-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-group label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0.2rem;
+}
+
+.preferences {
+  font-size: 0.9rem;
+}
+
+.card-actions {
+  padding: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  border-top: 1px solid #eee;
+  justify-content: flex-end;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #6c757d;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  padding: 2rem;
+  position: relative;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal h3 {
+  margin-top: 0;
+  color: var(--secondary-color);
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .user-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filter-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .applicant-details {
+    grid-template-columns: 1fr;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+
+  .applications-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Icon styles */
+[class^="icon-"] {
+  font-size: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* JavaScript functionality to show modal */
+/* Add this at the end of your CSS file */
+.modal-open {
+  overflow: hidden;
+}
+
+        /*!
+ * noUiSlider - 14.6.3 - Enhanced Version
+ * https://refreshless.com/nouislider/
+ * Copyright (c) 2020 Leon Gersen; Licensed MIT
+ */
+
+/* Base Styles & Reset */
+.noUi-target,
+.noUi-target * {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-user-select: none;
+  -ms-touch-action: none;
+  touch-action: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+/* Slider Base */
+.noUi-target {
+  position: relative;
+  background: #f5f5f5;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin: 1.5rem 0;
+}
+
+.noUi-base,
+.noUi-connects {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.noUi-connects {
+  overflow: hidden;
+  z-index: 0;
+  border-radius: 5px;
+}
+
+/* Slider Connection & Origin */
+.noUi-connect,
+.noUi-origin {
+  will-change: transform;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  transform-origin: 0 0;
+  transform-style: flat;
+  transition: transform 0.2s ease-out;
+}
+
+.noUi-connect {
+  height: 100%;
+  width: 100%;
+  background: #4a90e2;
+  border-radius: 3px;
+}
+
+.noUi-origin {
+  height: 10%;
+  width: 10%;
+}
+
+/* RTL Support */
+.noUi-txt-dir-rtl.noUi-horizontal .noUi-origin {
+  left: 0;
+  right: auto;
+}
+
+/* Orientation-specific styles */
+.noUi-vertical .noUi-origin {
+  width: 0;
+}
+
+.noUi-horizontal .noUi-origin {
+  height: 0;
+}
+
+/* Handle styling */
+.noUi-handle {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  position: absolute;
+  border: 1px solid #d0d0d0;
+  border-radius: 5px;
+  background: #ffffff;
+  cursor: grab;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s, background 0.2s;
+}
+
+.noUi-active {
+  cursor: grabbing;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  background: #fafafa;
+}
+
+.noUi-touch-area {
+  height: 100%;
+  width: 100%;
+}
+
+/* State changes */
+.noUi-state-tap .noUi-connect,
+.noUi-state-tap .noUi-origin {
+  transition: transform 0.3s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.noUi-state-drag * {
+  cursor: inherit !important;
+}
+
+/* Horizontal slider */
+.noUi-horizontal {
+  height: 10px;
+}
+
+.noUi-horizontal .noUi-handle {
+  width: 22px;
+  height: 22px;
+  right: -11px;
+  top: -7px;
+}
+
+/* Vertical slider */
+.noUi-vertical {
+  width: 10px;
+}
+
+.noUi-vertical .noUi-handle {
+  width: 22px;
+  height: 22px;
+  right: -7px;
+  top: -11px;
+}
+
+/* RTL horizontal handles */
+.noUi-txt-dir-rtl.noUi-horizontal .noUi-handle {
+  left: -11px;
+  right: auto;
+}
+
+/* Handle details (lines) */
+.noUi-handle:after,
+.noUi-handle:before {
+  content: "";
+  display: block;
+  position: absolute;
+  height: 10px;
+  width: 1px;
+  background: #e0e0e0;
+  left: 7px;
+  top: 5px;
+}
+
+.noUi-handle:after {
+  left: 13px;
+}
+
+.noUi-vertical .noUi-handle:after,
+.noUi-vertical .noUi-handle:before {
+  width: 10px;
+  height: 1px;
+  left: 5px;
+  top: 7px;
+}
+
+.noUi-vertical .noUi-handle:after {
+  top: 13px;
+}
+
+/* Disabled state */
+[disabled] .noUi-connect {
+  background: #d8d8d8;
+}
+
+[disabled] .noUi-handle,
+[disabled].noUi-handle,
+[disabled].noUi-target {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Pips (markings) */
+.noUi-pips,
+.noUi-pips * {
+  box-sizing: border-box;
+}
+
+.noUi-pips {
+  position: absolute;
+  color: #666;
+}
+
+.noUi-value {
+  position: absolute;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 12px;
+}
+
+.noUi-value-sub {
+  color: #999;
+  font-size: 10px;
+}
+
+.noUi-marker {
+  position: absolute;
+  background: #d8d8d8;
+}
+
+.noUi-marker-sub {
+  background: #e0e0e0;
+}
+
+.noUi-marker-large {
+  background: #bdbdbd;
+}
+
+/* Horizontal pip layout */
+.noUi-pips-horizontal {
+  padding: 10px 0;
+  height: 40px;
+  top: 100%;
+  left: 0;
+  width: 100%;
+}
+
+.noUi-value-horizontal {
+  transform: translate(-50%, 100%);
+  margin-top: 5px;
+}
+
+.noUi-rtl .noUi-value-horizontal {
+  transform: translate(50%, 100%);
+}
+
+.noUi-marker-horizontal.noUi-marker {
+  margin-left: -1px;
+  width: 1px;
+  height: 5px;
+}
+
+.noUi-marker-horizontal.noUi-marker-sub {
+  height: 8px;
+}
+
+.noUi-marker-horizontal.noUi-marker-large {
+  height: 12px;
+}
+
+/* Vertical pip layout */
+.noUi-pips-vertical {
+  padding: 0 10px;
+  height: 100%;
+  top: 0;
+  left: 100%;
+}
+
+.noUi-value-vertical {
+  transform: translate(0, -50%);
+  padding-left: 25px;
+}
+
+.noUi-rtl .noUi-value-vertical {
+  transform: translate(0, 50%);
+}
+
+.noUi-marker-vertical.noUi-marker {
+  width: 5px;
+  height: 1px;
+  margin-top: -1px;
+}
+
+.noUi-marker-vertical.noUi-marker-sub {
+  width: 8px;
+}
+
+.noUi-marker-vertical.noUi-marker-large {
+  width: 12px;
+}
+
+/* Tooltips */
+.noUi-tooltip {
+  display: block;
+  position: absolute;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  padding: 4px 8px;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  opacity: 0;
+  transform: translate(-50%, 0);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+
+.noUi-handle:hover .noUi-tooltip,
+.noUi-active .noUi-tooltip {
+  opacity: 1;
+  transform: translate(-50%, -5px);
+}
+
+.noUi-horizontal .noUi-tooltip {
+  left: 50%;
+  bottom: 130%;
+}
+
+.noUi-vertical .noUi-tooltip {
+  transform: translate(0, -50%);
+  top: 50%;
+  right: 130%;
+}
+
+.noUi-horizontal .noUi-origin > .noUi-tooltip {
+  transform: translate(50%, 0);
+  left: auto;
+  bottom: 14px;
+}
+
+.noUi-vertical .noUi-origin > .noUi-tooltip {
+  transform: translate(0, -18px);
+  top: auto;
+  right: 28px;
+}
+
+/* Hover & Focus States */
+.noUi-target:hover .noUi-handle,
+.noUi-target:focus .noUi-handle {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Different color themes - can be customized as needed */
+.noUi-connect.noUi-theme-blue {
+  background: #4a90e2;
+}
+
+.noUi-connect.noUi-theme-green {
+  background: #27ae60;
+}
+
+.noUi-connect.noUi-theme-orange {
+  background: #f39c12;
+}
+
+.noUi-connect.noUi-theme-red {
+  background: #e74c3c;
+}
+
+.noUi-connect.noUi-theme-purple {
+  background: #8e44ad;
+}
+
+/* Focus styling for accessibility */
+.noUi-target:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+}
+
+/* Media queries for responsive behavior */
+@media (max-width: 768px) {
+  .noUi-horizontal {
+    height: 8px;
+  }
+
+  .noUi-horizontal .noUi-handle {
+    width: 20px;
+    height: 20px;
+    right: -10px;
+    top: -7px;
+  }
+
+  .noUi-handle:after,
+  .noUi-handle:before {
+    height: 8px;
+    left: 6px;
+    top: 5px;
+  }
+
+  .noUi-handle:after {
+    left: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .noUi-pips-horizontal {
+    height: 30px;
+  }
+
+  .noUi-value {
+    font-size: 10px;
+  }
+}
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header Section -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="user-info">
+                    <h1>Application Management Dashboard</h1>
+                    <div class="user-details">
+                        <span class="user-name">{{ muser.name }}</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="user-meta">
+                        <span class="meta-item"><i class="icon-email"></i>{{ muser.email }}</span>
+                        <span class="meta-item"><i class="icon-phone"></i>{{ muser.phone_number }}</span>
+                    </div>
+                    <a href="{% url 'analytical_charts' %}" class="btn btn-logout">
+                        <i class="icon-logout"></i>Analytics
+                    </a>
+                    <a href="{% url 'managementLogout' %}" class="btn btn-logout">
+                        <i class="icon-logout"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Search and Filters -->
+            <section class="search-section" aria-label="Search and Filters">
+                <form method="GET" class="search-form" id="searchForm">
+                    <div class="search-container">
+                        <div class="search-input-wrapper">
+                            <i class="icon-search"></i>
+                            <input
+                                type="text"
+                                name="search"
+                                class="search-input"
+                                placeholder="Search applications..."
+                                value="{{ request.GET.search }}"
+                                aria-label="Search applications"
+                            >
+                        </div>
+                        <div class="filter-container">
+                            <select name="status" class="filter-select" aria-label="Filter by status">
+                                <option value="">Status: All</option>
+                                <option value="Pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="Approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="Rejected" {% if request.GET.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                            <select name="course" class="filter-select" aria-label="Filter by course">
+                                <option value="">Course: All</option>
+                                {% for course in available_courses %}
+                                    <option value="{{ course.tag }}" {% if request.GET.course == course.tag %}selected{% endif %}>
+                                        {{ course.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+
+
+                            <!-- 10th Marks Range Filter -->
+                            <div class="marks-range-container">
+                                <div class="marks-label-row">
+                                    <span class="marks-label">10th Percentage:</span>
+                                    <span id="tenthSliderValues" class="slider-values">0% - 100%</span>
+                                </div>
+
+                                <div id="tenthMarksSlider" class="marks-slider"></div>
+
+                                <!-- Hidden inputs to store values for form submission -->
+                                <input
+                                    type="hidden"
+                                    name="min_marks"
+                                    id="tenthMinMarksInput"
+                                    value="{{ request.GET.min_marks|default:'0' }}"
+                                >
+                                <input
+                                    type="hidden"
+                                    name="max_marks"
+                                    id="tenthMaxMarksInput"
+                                    value="{{ request.GET.max_marks|default:'100' }}"
+                                >
+                            </div>
+
+                            <p>        </p>
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+
+                            <!-- 12th Marks Range Filter -->
+                            <div class="marks-range-container">
+                                <div class="marks-label-row">
+                                    <span class="marks-label">12th Percentage:</span>
+                                    <span id="twelfthSliderValues" class="slider-values">0% - 100%</span>
+                                </div>
+
+                                <div id="twelfthMarksSlider" class="marks-slider"></div>
+
+                                <!-- Hidden inputs to store values for form submission -->
+                                <input
+                                    type="hidden"
+                                    name="12th_min_marks"
+                                    id="twelfthMinMarksInput"
+                                    value="{{ request.GET.12th_min_marks|default:'0' }}"
+                                >
+                                <input
+                                    type="hidden"
+                                    name="12th_max_marks"
+                                    id="twelfthMaxMarksInput"
+                                    value="{{ request.GET.12th_max_marks|default:'100' }}"
+                                >
+                            </div>
+
+                            &nbsp;
+                            &nbsp;
+                            &nbsp;
+
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            <button type="button" class="btn btn-secondary" id="clearFiltersBtn">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Notifications -->
+            <div id="notifications" class="notifications-container" role="alert" aria-live="polite"></div>
+
+            <!-- Applications List -->
+            <section class="applications-section" aria-label="Applications List">
+                <h2 class="section-title">Applications ({{ applications|length }})</h2>
+
+                {% if applications %}
+                    <div class="applications-grid">
+                        {% for application in applications %}
+                            <article class="application-card" data-application-id="{{ application.id }}">
+                                <div class="card-header">
+                                    <h3 class="application-number">
+                                        Application #{{ application.application_number }}
+                                    </h3>
+                                    <div class="status-badge status-{{ application.status }}" id="status-{{ application.id }}">
+                                        {{ application.status|capfirst }}
+                                    </div>
+                                </div>
+
+                                <div class="card-content">
+                                    <div class="applicant-details">
+                                        <div class="detail-group">
+                                            <label>Name</label>
+                                            <span>{{ application.full_name }}</span>
+                                        </div>
+                                        <div class="detail-group">
+                                            <label>Email</label>
+                                            <span>{{ application.email }}</span>
+                                        </div>
+                                        <div class="detail-group">
+                                            <label>Phone</label>
+                                            <span>{{ application.phone_number }}</span>
+                                        </div>
+                                        <div class="detail-group">
+                                            <label>Marks</label>
+                                            <span>{{ application.total_percentage }}</span>
+                                        </div>
+                                        <div class="detail-group">
+                                            <label>Allotted Course</label>
+                                            <span id="course-{{ application.id }}">
+                                                {{ application.alloted_course|default:"Not Allocated" }}
+                                            </span>
+                                        </div>
+                                        <div class="detail-group">
+                                            <label>Course Preferences</label>
+                                            <span class="preferences">
+                                                1. {{ application.priority_1 }}
+                                                2. {{ application.priority_2 }}
+                                                3. {{ application.priority_3 }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-actions">
+                                    <button class="btn btn-outline update-status-btn" data-application-id="{{ application.id }}" data-current-status="{{ application.status }}">
+                                        Update Status
+                                    </button>
+                                    <button class="btn btn-outline allot-course-btn"
+                                        data-application-id="{{ application.id }}"
+                                        data-current-course="{{ application.alloted_course }}"
+                                        data-priority1="{{ application.priority_1 }}"
+                                        data-priority2="{{ application.priority_2 }}"
+                                        data-priority3="{{ application.priority_3 }}">
+                                        Allot Course
+                                    </button>
+                                    <a href="{% url 'application_details' application.id %}" class="btn btn-primary">
+                                        View Details
+                                    </a>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="icon-empty"></i>
+                        <p>No applications found matching your criteria.</p>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    <center>
+
+        <!-- Status Update Modal -->
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <h3>Update Application Status</h3>
+            <form id="statusForm">
+                <input type="hidden" id="statusApplicationId" name="application_id">
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="status" value="Pending"> Pending
+                    </label>
+                    <label>
+                        <input type="radio" name="status" value="Approved"> Approved
+                    </label>
+                    <label>
+                        <input type="radio" name="status" value="Rejected"> Rejected
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Allotment Modal -->
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <h3>Allot Course</h3>
+            <form id="courseForm">
+                <input type="hidden" id="courseApplicationId" name="application_id">
+                <div id="courseOptions" class="radio-group">
+                    <!-- Course options will be dynamically populated -->
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary modal-close">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    </center>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.11.2/toastify.min.js"></script>
+
+    <script>
+        // Unified slider initialization function
+function initializeSlider(sliderId, valuesId, minInputId, maxInputId) {
+    const slider = document.getElementById(sliderId);
+    const sliderValues = document.getElementById(valuesId);
+    const minInput = document.getElementById(minInputId);
+    const maxInput = document.getElementById(maxInputId);
+
+    // Create the slider
+    noUiSlider.create(slider, {
+        start: [
+            parseFloat(minInput.value) || 0,
+            parseFloat(maxInput.value) || 100
+        ],
+        connect: true,
+        step: 1,
+        range: {
+            'min': 0,
+            'max': 100
+        },
+        format: {
+            to: function (value) {
+                return Math.round(value);
+            },
+            from: function (value) {
+                return parseInt(value);
+            }
+        }
+    });
+
+    // Update the display values and hidden inputs when slider changes
+    slider.noUiSlider.on('update', function (values, handle) {
+        const min = values[0];
+        const max = values[1];
+
+        sliderValues.textContent = `${min} - ${max}`;
+        minInput.value = min;
+        maxInput.value = max;
+    });
+
+    // Trigger search when slider changes (but not during dragging)
+    slider.noUiSlider.on('change', function() {
+        // Check if dashboardManager exists before calling performSearch
+        if (window.dashboardManager) {
+            window.dashboardManager.performSearch();
+        }
+    });
+
+    return slider;
+}
+
+class DashboardManager {
+    constructor() {
+        this.endpoints = {
+            search: "{% url 'search_applications' %}",
+            updateStatus: "{% url 'update_status' %}",
+            updateCourse: "{% url 'update_course' %}"
+        };
+        this.currentPage = 1;
+        this.searchTimeout = null;
+        this.isLoading = false;
+        this.initializeEventListeners();
+
+        // Instead of calling a separate method for sliders,
+        // we'll use the unified slider initialization in the DOM loaded event
+    }
+
+    initializeEventListeners() {
+        // Search and filter handlers
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('input', () => {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => this.performSearch(), 300);
+        });
+
+        document.querySelectorAll('.filter-select').forEach(input => {
+            input.addEventListener('change', () => this.performSearch());
+        });
+
+        document.getElementById('clearFiltersBtn').addEventListener('click', () => {
+            document.getElementById('searchForm').reset();
+
+            // Reset all sliders to default values
+            if (this.marksSlider && this.marksSlider.noUiSlider) {
+                this.marksSlider.noUiSlider.set([0, 100]);
+            }
+
+            if (window.tenthMarksSlider && window.tenthMarksSlider.noUiSlider) {
+                window.tenthMarksSlider.noUiSlider.set([0, 100]);
+            }
+
+            if (window.twelfthMarksSlider && window.twelfthMarksSlider.noUiSlider) {
+                window.twelfthMarksSlider.noUiSlider.set([0, 100]);
+            }
+
+            this.performSearch();
+        });
+
+        // Modal handlers
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', () => this.closeModals());
+        });
+
+        // Form submissions
+        const statusForm = document.getElementById('statusForm');
+        if (statusForm) {
+            statusForm.addEventListener('submit', this.handleStatusUpdate.bind(this));
+        }
+
+        const courseForm = document.getElementById('courseForm');
+        if (courseForm) {
+            courseForm.addEventListener('submit', this.handleCourseUpdate.bind(this));
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                this.closeModals();
+            }
+        });
+
+        // Initial search
+        this.performSearch();
+    }
+
+    showLoading() {
+        this.isLoading = true;
+        const applicationsSection = document.querySelector('.applications-section');
+        // Loading indicator implementation can be added here if needed
+    }
+
+    hideLoading() {
+        this.isLoading = false;
+    }
+
+    async performSearch(page = 1) {
+        if (this.isLoading) return;
+
+        this.showLoading();
+        const searchParams = new URLSearchParams();
+
+        // Get search input value
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchParams.append('search', searchInput.value);
+        }
+
+        // Get status value
+        const statusSelect = document.querySelector('select[name="status"]');
+        if (statusSelect) {
+            searchParams.append('status', statusSelect.value);
+        }
+
+        // Get course value
+        const courseSelect = document.querySelector('select[name="course"]');
+        if (courseSelect) {
+            searchParams.append('course', courseSelect.value);
+        }
+
+        // Get marks filter values
+        // First check if we're using the unified marks slider
+        const minMarksInput = document.querySelector('input[name="min_marks"]');
+        const maxMarksInput = document.querySelector('input[name="max_marks"]');
+
+        if (minMarksInput && maxMarksInput) {
+            searchParams.append('min_marks', minMarksInput.value);
+            searchParams.append('max_marks', maxMarksInput.value);
+        }
+
+        // Check if we're using the separate 10th/12th marks sliders
+        const tenthMinInput = document.getElementById('tenthMinMarksInput');
+        const tenthMaxInput = document.getElementById('tenthMaxMarksInput');
+
+        if (tenthMinInput && tenthMaxInput) {
+            searchParams.append('tenth_min_marks', tenthMinInput.value);
+            searchParams.append('tenth_max_marks', tenthMaxInput.value);
+        }
+
+        const twelfthMinInput = document.getElementById('twelfthMinMarksInput');
+        const twelfthMaxInput = document.getElementById('twelfthMaxMarksInput');
+
+        if (twelfthMinInput && twelfthMaxInput) {
+            searchParams.append('twelfth_min_marks', twelfthMinInput.value);
+            searchParams.append('twelfth_max_marks', twelfthMaxInput.value);
+        }
+
+        // Add page
+        searchParams.append('page', page);
+
+        try {
+            const response = await fetch(`${this.endpoints.search}?${searchParams.toString()}`);
+            if (!response.ok) throw new Error('Search request failed');
+
+            const data = await response.json();
+            this.updateSearchResults(data);
+            this.updatePagination(data);
+        } catch (error) {
+            this.showNotification('Error performing search: ' + error.message, 'error');
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    updateSearchResults(data) {
+        const applicationsSection = document.querySelector('.applications-section');
+        if (!applicationsSection) return;
+
+        // Update results count
+        const countTitle = applicationsSection.querySelector('.section-title') ||
+            document.createElement('h2');
+        countTitle.className = 'section-title';
+        countTitle.textContent = `Applications (${data.total_results})`;
+
+        if (!applicationsSection.querySelector('.section-title')) {
+            applicationsSection.insertBefore(countTitle, applicationsSection.firstChild);
+        }
+
+        // Create or update applications grid
+        let applicationsGrid = applicationsSection.querySelector('.applications-grid');
+        if (!applicationsGrid) {
+            applicationsGrid = document.createElement('div');
+            applicationsGrid.className = 'applications-grid';
+            applicationsSection.appendChild(applicationsGrid);
+        }
+
+        if (data.results.length === 0) {
+            applicationsGrid.innerHTML = `
+                <div class="empty-state">
+                    <i class="icon-empty"></i>
+                    <p>No applications found matching your criteria.</p>
+                </div>
+            `;
+            return;
+        }
+
+        applicationsGrid.innerHTML = data.results.map(app => this.createApplicationCard(app)).join('');
+        this.initializeCardEventListeners();
+    }
+
+    createApplicationCard(app) {
+        return `
+            <article class="application-card" data-application-id="${app.id}">
+                <div class="card-header">
+                    <h3 class="application-number">
+                        Application #${app.application_number}
+                    </h3>
+                    <div class="status-badge status-${app.status || 'unknown'}" id="status-${app.id}">
+                        ${app.status ? (app.status.charAt(0).toUpperCase() + app.status.slice(1)) : 'Unknown'}
+                    </div>
+                </div>
+
+                <div class="card-content">
+                    <div class="applicant-details">
+                        <div class="detail-group">
+                            <label>Name</label>
+                            <span>${app.full_name}</span>
+                        </div>
+                        <div class="detail-group">
+                            <label>Email</label>
+                            <span>${app.email}</span>
+                        </div>
+                        <div class="detail-group">
+                            <label>Phone</label>
+                            <span>${app.phone_number}</span>
+                        </div>
+                        <div class="detail-group">
+                            <label>10th Overall Percentage</label>
+                            <span>${app.sslc_percentage}</span>
+                        </div>
+                        <div class="detail-group">
+                            <label>12th Overall Percentage</label>
+                            <span>${app.total_percentage}</span>
+                        </div>
+                        <div class="detail-group">
+                            <label>Allotted Course</label>
+                            <span id="course-${app.id}">
+                                ${app.alloted_course || "Not Allocated"}
+                            </span>
+                        </div>
+                        <div class="detail-group">
+                            <label>Course Preferences</label>
+                            <span class="preferences">
+                                1. ${app.priority_1}
+                                2. ${app.priority_2}
+                                3. ${app.priority_3}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn btn-outline update-status-btn"
+                        data-application-id="${app.id}"
+                        data-current-status="${app.status}">
+                        Update Status
+                    </button>
+                    <button class="btn btn-outline allot-course-btn"
+                        data-application-id="${app.id}"
+                        data-current-course="${app.alloted_course || ''}"
+                        data-priority1="${app.priority_1}"
+                        data-priority2="${app.priority_2}"
+                        data-priority3="${app.priority_3}">
+                        Allot Course
+                    </button>
+                    <a href="/application_details/${app.id}/" class="btn btn-primary" style="text-decoration:none">
+                        View Details
+                    </a>
+                </div>
+            </article>
+        `;
+    }
+
+    updatePagination(data) {
+        const applicationsSection = document.querySelector('.applications-section');
+        if (!applicationsSection) return;
+
+        let paginationContainer = document.querySelector('.pagination');
+        if (!paginationContainer) {
+            paginationContainer = document.createElement('div');
+            paginationContainer.className = 'pagination';
+            applicationsSection.appendChild(paginationContainer);
+        }
+
+        if (data.total_pages > 1) {
+            paginationContainer.innerHTML = `
+                <button class="btn btn-outline"
+                    ${data.current_page === 1 ? 'disabled' : ''}
+                    onclick="window.dashboardManager.performSearch(${data.current_page - 1})">
+                    Previous
+                </button>
+                <span class="pagination-info">
+                    Page ${data.current_page} of ${data.total_pages}
+                </span>
+                <button class="btn btn-outline"
+                    ${data.current_page === data.total_pages ? 'disabled' : ''}
+                    onclick="window.dashboardManager.performSearch(${data.current_page + 1})">
+                    Next
+                </button>
+            `;
+        } else {
+            paginationContainer.innerHTML = '';
+        }
+    }
+
+    initializeCardEventListeners() {
+        document.querySelectorAll('.update-status-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.openStatusModal(e.target));
+        });
+
+        document.querySelectorAll('.allot-course-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.openCourseModal(e.target));
+        });
+    }
+
+    openStatusModal(button) {
+        const applicationId = button.dataset.applicationId;
+        const currentStatus = button.dataset.currentStatus;
+        const statusModal = document.getElementById('statusModal');
+
+        if (!statusModal) return;
+
+        document.getElementById('statusApplicationId').value = applicationId;
+
+        const statusRadio = document.querySelector(`input[name="status"][value="${currentStatus}"]`);
+        if (statusRadio) {
+            statusRadio.checked = true;
+        }
+
+        statusModal.style.display = 'block';
+    }
+
+    openCourseModal(button) {
+        const {
+            applicationId,
+            currentCourse,
+            priority1,
+            priority2,
+            priority3
+        } = button.dataset;
+
+        const courseModal = document.getElementById('courseModal');
+        if (!courseModal) return;
+
+        document.getElementById('courseApplicationId').value = applicationId;
+
+        const courseOptions = document.getElementById('courseOptions');
+        if (courseOptions) {
+            const uniqueCourses = [...new Set([priority1, priority2, priority3, 'Not Allocated'])];
+            const optionsHtml = uniqueCourses
+                .map(course => this.createCourseOption(course, currentCourse))
+                .join('');
+
+            courseOptions.innerHTML = optionsHtml;
+        }
+
+        courseModal.style.display = 'block';
+    }
+
+    createCourseOption(course, currentCourse) {
+        const value = course === 'Not Allocated' ? '' : course;
+        return `
+            <label class="course-option ${currentCourse === course ? 'selected' : ''}">
+                <input type="radio" name="allotted_course" value="${value}"
+                       ${currentCourse === course ? 'checked' : ''}>
+                <span>${course}</span>
+            </label>
+        `;
+    }
+
+    closeModals() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+    }
+
+    async handleStatusUpdate(e) {
+        e.preventDefault();
+        const statusApplicationId = document.getElementById('statusApplicationId');
+        const statusChecked = document.querySelector('input[name="status"]:checked');
+
+        if (!statusApplicationId || !statusChecked) {
+            this.showNotification('Missing required fields', 'error');
+            return;
+        }
+
+        const formData = {
+            application_id: statusApplicationId.value,
+            status: statusChecked.value
+        };
+
+        try {
+            const response = await this.makeRequest(this.endpoints.updateStatus, formData);
+            if (response.success) {
+                this.updateStatusUI(formData.application_id, formData.status);
+                this.showNotification('Status updated successfully');
+                this.closeModals();
+            }
+        } catch (error) {
+            this.showNotification(error.message, 'error');
+        }
+    }
+
+    async handleCourseUpdate(e) {
+        e.preventDefault();
+        const courseApplicationId = document.getElementById('courseApplicationId');
+        const courseChecked = document.querySelector('input[name="allotted_course"]:checked');
+
+        if (!courseApplicationId || !courseChecked) {
+            this.showNotification('Missing required fields', 'error');
+            return;
+        }
+
+        const formData = {
+            application_id: courseApplicationId.value,
+            allotted_course: courseChecked.value
+        };
+
+        try {
+            const response = await this.makeRequest(this.endpoints.updateCourse, formData);
+            if (response.success) {
+                this.updateCourseUI(formData.application_id, formData.allotted_course);
+                this.showNotification('Course allotment updated successfully');
+                this.closeModals();
+            }
+        } catch (error) {
+            this.showNotification(error.message, 'error');
+        }
+    }
+
+    async makeRequest(url, data) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': this.getCookie('csrftoken')
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error('Request failed');
+        }
+
+        return await response.json();
+    }
+
+    updateStatusUI(applicationId, status) {
+        const statusElement = document.getElementById(`status-${applicationId}`);
+        if (statusElement) {
+            statusElement.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            statusElement.className = `status-badge status-${status}`;
+        }
+
+        const button = document.querySelector(`.update-status-btn[data-application-id="${applicationId}"]`);
+        if (button) {
+            button.dataset.currentStatus = status;
+        }
+    }
+
+    updateCourseUI(applicationId, course) {
+        const courseElement = document.getElementById(`course-${applicationId}`);
+        if (courseElement) {
+            courseElement.textContent = course || "Not Allocated";
+        }
+
+        const button = document.querySelector(`.allot-course-btn[data-application-id="${applicationId}"]`);
+        if (button) {
+            button.dataset.currentCourse = course;
+        }
+    }
+
+    showNotification(message, type = 'success') {
+        if (typeof Toastify !== 'undefined') {
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: type === 'success' ? "#28a745" : "#dc3545",
+                stopOnFocus: true
+            }).showToast();
+        } else {
+            // Fallback if Toastify is not available
+            alert(message);
+        }
+    }
+
+    getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+}
+
+// Initialize everything when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize 10th marks slider
+    window.tenthMarksSlider = initializeSlider(
+        'tenthMarksSlider',
+        'tenthSliderValues',
+        'tenthMinMarksInput',
+        'tenthMaxMarksInput'
+    );
+
+    // Initialize 12th marks slider
+    window.twelfthMarksSlider = initializeSlider(
+        'twelfthMarksSlider',
+        'twelfthSliderValues',
+        'twelfthMinMarksInput',
+        'twelfthMaxMarksInput'
+    );
+
+    // Initialize the general marks slider if it exists
+    const marksSlider = document.getElementById('marksSlider');
+    if (marksSlider) {
+        const minMarksInput = document.getElementById('minMarksInput');
+        const maxMarksInput = document.getElementById('maxMarksInput');
+        const sliderValueDisplay = document.getElementById('sliderValues');
+
+        if (minMarksInput && maxMarksInput && sliderValueDisplay) {
+            window.mainMarksSlider = initializeSlider(
+                'marksSlider',
+                'sliderValues',
+                'minMarksInput',
+                'maxMarksInput'
+            );
+        }
+    }
+
+    // Initialize the dashboard manager
+    window.dashboardManager = new DashboardManager();
+
+    // Store reference to sliders in dashboard manager for reset functionality
+    if (window.dashboardManager) {
+        window.dashboardManager.marksSlider = window.mainMarksSlider;
+    }
+});
+    </script>
+</body>
+</html>

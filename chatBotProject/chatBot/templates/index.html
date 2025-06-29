@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        const csrfToken = '{{ csrf_token }}';
+    </script>
+    <title>Prestige College</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
+    <style>
+     /* ======== Notice Section Styling ======== */
+#admissions {
+    background: url("{% static 'images/notice-board.jpg' %}") no-repeat center;
+    background-size: cover;
+    padding: 50px 20px;
+    text-align: center;
+    color: #fff;
+}
+
+/* Section Heading */
+#admissions h2 {
+    font-size: 28px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    display: inline-block;
+    padding-bottom: 5px;
+    border-bottom: 3px solid #ffeb3b;
+}
+
+/* Notice Board Container */
+.admission-notices {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Notice Cards */
+.admission-notice {
+    background: #fffae6;
+    color: #333;
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    border-left: 5px solid #ff9800;
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    position: relative;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Sticky Pin Effect */
+.admission-notice::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: red;
+    border-radius: 50%;
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover Effect */
+.admission-notice:hover {
+    transform: scale(1.03);
+    background: #fff3cd;
+}
+
+/* No Notice Message */
+#admissions p {
+    font-size: 16px;
+    color: #111;
+    font-style: italic;
+}
+
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="managementLogin">Management</a>
+        <a href="../application_home">Admission Portal</a>
+        <a href="#courses">Courses</a>
+        <a href="#admissions">Admission Notices</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <section id="hero">
+        <div class="hero-image-container">
+            <img src="{% static 'images/campus.jpg' %}" alt="campus" class="hero-image">
+            <div class="hero-text-overlay">
+                <h1>Welcome to Prestige College</h1>
+                <p>Your future begins here. Discover our courses and start your journey today.</p>
+                <a href="#courses" class="cta-button">Explore Courses</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="courses">
+        <h2>Our Courses</h2>
+        <div class="course-grid">
+            {% for course in courses %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ course.course }}</h5>
+                    <p class="card-text">{{ course.description }}</p>
+                    <p class="card-info"><strong>Duration:</strong> 3 Years</p>
+                    <p class="card-info"><strong>Fees:</strong> ₹{{ total_fee }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p>No courses available at the moment. Please check back later!</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section id="admissions">
+        <h2>Admission Notices</h2>
+        <div class="admission-notices">
+            {% for notice in notices %}
+            <div class="admission-notice">
+                <p>{{ notice.notice }}</p>
+            </div>
+            {% empty %}
+            <p>No admission notices available at the moment.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>Contact Us</h2>
+        <div class="contact-info">
+            <p><strong>Address:</strong> 123 College Avenue, Prestige City, Country, 56789</p>
+            <p><strong>Phone:</strong> +1 (123) 456-7890</p>
+            <p><strong>Email:</strong> prestige.college@example.com</p>
+        </div>
+    </section>
+
+    <button id="chatbot-button" onclick="toggleChatbox()"><img src="{% static 'images/chatbot.png' %}" height="40px" width="40px"></button>
+    <div id="chatbox" class="chatbox" style="display: none;">
+        <div id="chatMessages"></div>
+        <input type="text" id="chatInput" placeholder="Type a message...">
+        <button onclick="sendChat()">Send</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Prestige College. All rights reserved.</p>
+        <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="https://www.archonsolution.in/"><img src="{% static 'images/archon1.png'%}" height="50px" width="100px"></a>
+    </footer>
+
+    <script>
+        function toggleChatbox() {
+            const chatbox = document.getElementById('chatbox');
+            chatbox.style.display = chatbox.style.display === 'none' || chatbox.style.display === '' ? 'block' : 'none';
+
+            // Only initiate chat once when the chatbot is opened
+            if (!chatbox.hasInitiated) {
+                chatbox.hasInitiated = true;
+                initiateChat();
+            }
+        }
+
+        function initiateChat() {
+            const chatMessages = document.getElementById('chatMessages');
+
+            // Send an empty message to trigger the chatbot's greeting
+            fetch('/chatbot/', {
+                method: 'POST',
+                body: JSON.stringify({ message: "" }), // Send an empty message
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken // Include the CSRF token here
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                chatMessages.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Check if the response contains keywords that should trigger action
+                if (data.response.toLowerCase().includes("course")) {
+                    showCourseRedirectButton();
+                }
+            });
+        }
+
+        function sendChat() {
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value;
+
+            if (message.trim() !== "") {
+                chatMessages.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+                chatInput.value = "";
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                fetch('/chatbot/', {
+                    method: 'POST',
+                    body: JSON.stringify({ message: message }),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken // Include the CSRF token here
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    chatMessages.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                    // Check if the response contains keywords that should trigger action
+                    if (data.response.toLowerCase().includes("course")) {
+                        showCourseRedirectButton();
+                    }
+                });
+            }
+        }
+
+        // Show a button asking if the user wants to view course details
+        function showCourseRedirectButton() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML += `
+                <div id="courseButtonContainer">
+                    <p><strong>Bot:</strong> Would you like to see more details about the courses?</p>
+                    <button onclick="redirectToCourseDetails()">Yes</button>
+                    <button onclick="continueChat()">No</button>
+                </div>
+            `;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Function to redirect to the courses section
+        function redirectToCourseDetails() {
+            const courseButtonContainer = document.getElementById('courseButtonContainer');
+            if (courseButtonContainer) {
+                courseButtonContainer.style.display = 'none'; // Hide the button container after click
+            }
+            const coursesSection = document.getElementById('courses');
+            if (coursesSection) {
+                coursesSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Function for continuing the chat without redirection
+        function continueChat() {
+            const courseButtonContainer = document.getElementById('courseButtonContainer');
+            if (courseButtonContainer) {
+                courseButtonContainer.style.display = 'none'; // Hide the button container after click
+            }
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML += `<p><strong>Bot:</strong> Alright, how else can I assist you?</p>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>

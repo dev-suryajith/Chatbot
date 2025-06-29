@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Payment Page</title>
+    <style>
+        .payment-form {
+            display: none;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Select Payment Method and Complete Payment</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    <h3>Select Payment Method</h3>
+    <div>
+        {% for radio in form.payment_method %}
+            <div>
+                {{ radio.tag }} {{ radio.choice_label }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <h3>Payment Amount</h3>
+    {{ form.amount }}
+
+    <h3>Billing Address</h3>
+    {{ form.billing_address }}
+
+    <!-- Credit Card Form -->
+    <div id="credit-card-form" class="payment-form">
+        <h3>Credit Card Details</h3>
+        <input type="text" name="card_number" class="form-control" placeholder="•••• •••• •••• ••••" maxlength="19">
+        <input type="text" name="card_holder" class="form-control" placeholder="Cardholder Name">
+        <input type="text" name="expiry_date" class="form-control" placeholder="MM/YY" maxlength="5">
+        <input type="text" name="security_code" class="form-control" placeholder="CVV" maxlength="4">
+    </div>
+
+    <!-- PayPal Form -->
+    <div id="paypal-form" class="payment-form">
+        <h3>PayPal Details</h3>
+        <input type="email" name="paypal_email" class="form-control" placeholder="PayPal Email">
+    </div>
+
+    <!-- Bank Transfer Form -->
+    <div id="bank-transfer-form" class="payment-form">
+        <h3>Bank Transfer Details</h3>
+        <input type="text" name="account_name" class="form-control" placeholder="Account Holder Name">
+        <input type="text" name="account_number" class="form-control" placeholder="Account Number">
+        <input type="text" name="routing_number" class="form-control" placeholder="Routing Number">
+        <input type="text" name="bank_name" class="form-control" placeholder="Bank Name">
+    </div>
+
+    <!-- Crypto Payment Form -->
+    <div id="crypto-form" class="payment-form">
+        <h3>Crypto Payment Details</h3>
+        <input type="text" name="wallet_address" class="form-control" placeholder="Wallet Address" readonly value="12345abcde67890fghi12345jklmno67890">
+    </div>
+
+    <button type="submit">Submit Payment</button>
+</form>
+
+<script>
+    // Payment Method Switching Logic
+    const paymentForms = {
+        'Credit Card': document.getElementById('credit-card-form'),
+        'PayPal': document.getElementById('paypal-form'),
+        'Bank Transfer': document.getElementById('bank-transfer-form'),
+        'Crypto': document.getElementById('crypto-form')
+    };
+
+    function hideAllForms() {
+        for (let key in paymentForms) {
+            paymentForms[key].style.display = 'none';
+        }
+    }
+
+    function showForm(method) {
+        hideAllForms();
+        if (paymentForms[method]) {
+            paymentForms[method].style.display = 'block';
+        }
+    }
+
+    // Initial Hide
+    hideAllForms();
+
+    // Add event listener to all radio buttons
+    document.querySelectorAll('.payment-method-radio').forEach(radio => {
+        radio.addEventListener('change', function() {
+            showForm(this.nextSibling.textContent.trim());
+        });
+    });
+
+    // Auto select first method if present
+    const firstRadio = document.querySelector('.payment-method-radio');
+    if (firstRadio) {
+        firstRadio.checked = true;
+        showForm(firstRadio.nextSibling.textContent.trim());
+    }
+</script>
+
+</body>
+</html>

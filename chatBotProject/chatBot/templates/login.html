@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applicant Login</title>
+    <style>
+        :root {
+            --primary: #8b0000;
+            --primary-hover: #a60000;
+            --background: #f8f4e3;
+            --text: #333;
+            --light-text: #555;
+            --input-bg: #f8f4e3;
+            --card-bg: #fff;
+            --error: #d32f2f;
+            --border: #ccc;
+            --accent: #FFD700;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border: 2px solid var(--primary);
+            padding: 35px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--light-text);
+            font-size: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--input-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.2);
+        }
+
+        .error {
+            color: var(--error);
+            font-size: 13px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .register-link {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            opacity: 0.9;
+        }
+
+        /* Custom styling for Django form */
+        form p {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        form p label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--light-text);
+            font-size: 15px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 520px) {
+            .container {
+                padding: 25px 20px;
+                border-radius: 12px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            input, select, .btn {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
+        /* If you need to add forgot password link */
+        .forgot-password {
+            text-align: right;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .forgot-password a {
+            color: var(--light-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Applicant Login</h2>
+        </div>
+        <form method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">
+                            {{ field.errors|striptags }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn">Login</button>
+        </form>
+        <div class="register-link">
+            <b>New user? </b><a href="{% url 'signup' %}" style="color:#8b0000">Register here</a>
+        </div>
+    </div>
+</body>
+</html>

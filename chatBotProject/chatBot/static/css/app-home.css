@@ -1,0 +1,142 @@
+      body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f4e3; /* Off-white/cream background */
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background: linear-gradient(135deg, #b22222, #8b0000); /* Darker red gradient */
+    padding: 20px 0;
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+}
+
+.nav-links li {
+    display: inline;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.nav-links a:hover {
+    color: #f8f4e3; /* Off-white/cream for hover */
+    transform: translateY(-2px);
+}
+
+.apply-btn {
+    text-decoration: none;
+    background-color: #f8f4e3;
+    padding: 10px 20px;
+    border-radius: 25px;
+    color: #b22222; /* Red for text */
+    font-weight: 600;
+    border: 2px solid #b22222; /* Red border */
+    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+}
+
+.apply-btn:hover {
+    background-color: #b22222; /* Red background on hover */
+    color: white;
+    border-color: white;
+    transform: scale(1.05);
+}
+
+.hero {
+    text-align: center;
+}
+
+.hero h1 {
+    margin-bottom: 20px;
+    color: #b22222; /* Red for heading */
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.hero p {
+    font-size: 18px;
+    color: #555;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+footer {
+    background: linear-gradient(135deg, #b22222, #8b0000); /* Darker red gradient */
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 14px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Subtle animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.hero {
+    animation: fadeIn 1s ease-in-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .hero {
+        padding: 60px 20px;
+        margin: 30px 20px;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+}

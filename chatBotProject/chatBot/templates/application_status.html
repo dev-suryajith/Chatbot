@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application List</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+
+        header {
+    background: linear-gradient(135deg, #b22222, #8b0000); /* Darker red gradient */
+    padding: 20px 0;
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 25px;
+    margin: 0;
+}
+
+.nav-links li {
+    display: inline;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.nav-links a:hover {
+    color: #f8f4e3; /* Off-white/cream for hover */
+    transform: translateY(-2px);
+}
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f8f4e3;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #8b0000;
+            font-size: 32px;
+            margin: 0;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background-color: #8b0000;
+            border-radius: 2px;
+        }
+
+        .application-list {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .application-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .application-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background-color: #8b0000;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .action-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            background-color: #8b0000;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 0, 0, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #8b0000;
+            margin-bottom: 20px;
+        }
+
+        .empty-state p {
+            font-size: 20px;
+            color: #666;
+            margin: 0;
+        }
+
+        /* Modal Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            width: 400px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #8b0000;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+            font-size: 16px;
+        }
+
+        input[readonly] {
+            background-color: #f8f4e3;
+            cursor: not-allowed;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">Prestige College</div>
+            <ul class="nav-links">
+                <li><a href="../">College Website</a></li>
+                <li><a href="../application_home">Application Portal</a></li>
+                {% if not request.session.suser_name %}
+                    <li><a href="../signup">Sign Up!</a></li>
+                {% else %}
+                    <li>{{ request.session.suser_name }}</li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+<div class="container">
+    <div class="dashboard-header">
+        <h2>Your Applications</h2>
+    </div>
+    {% for key, value in applications.items %}
+        <p>{{ key }}: {{ value }}</p>
+    {% endfor %}
+
+     <ul class="application-list">
+        {% for app in applications %}
+        <li class="application-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-file-alt"></i>
+                    {{ app.admission_for }}
+                </h3>
+                <span class="status-badge status-{{ app.status|lower }}">
+                    {{ app.status }}
+                </span>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value">{{ app.full_name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Academic Year</span>
+                        <span class="info-value">{{ app.academic_year }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">{{ app.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Application Number</span>
+                        <span class="info-value">#{{ app.application_number }}</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="action-button">
+                        <i class="fas fa-edit"></i>
+                        <a href="../editApplication/{{ app.id }}" style="text-decoration: none; color: white;">Edit Details</a>
+                    </button>
+                </div>
+            </div>
+        </li>
+        {% empty %}
+        <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <p>No applications found.</p>
+        </div>
+        {% endfor %}
+    </ul>
+</div>
+
+<script>
+    function openModal(application_id, name, admission, status, year, email, application_number) {
+        document.getElementById("modalId").value = application_number;
+        document.getElementById("modalName").value = name;
+        document.getElementById("modalEmail").value = email;
+        document.getElementById("modalAdmission").value = admission;
+        document.getElementById("modalYear").value = year;
+
+        const overlay = document.getElementById("modalOverlay");
+        overlay.style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById("modalOverlay").style.display = "none";
+    }
+
+    document.getElementById("applicationForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        alert("Changes saved successfully!");
+        closeModal();
+    });
+</script>
+
+</body>
+</html>

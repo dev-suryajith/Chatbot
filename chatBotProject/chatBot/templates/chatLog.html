@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Logs | System Monitoring</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Dark mode colors (default) */
+            --background: #1e1e1e;
+            --header-bg: #252526;
+            --log-bg: #000000;
+            --text-primary: #cccccc;
+            --text-secondary: #858585;
+            --user-color: #569cd6;
+            --bot-color: #4ec9b0;
+            --timestamp-color: #608b4e;
+            --border-color: #3c3c3c;
+            --button-bg: #333333;
+            --button-hover: #444444;
+            --font-mono: 'Consolas', 'Courier New', monospace;
+        }
+
+        /* Light mode colors */
+        [data-theme="light"] {
+            --background: #f0f0f0;
+            --header-bg: #e0e0e0;
+            --log-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --user-color: #0066cc;
+            --bot-color: #008855;
+            --timestamp-color: #607d8b;
+            --border-color: #cccccc;
+            --button-bg: #dddddd;
+            --button-hover: #c0c0c0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 0;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header {
+            background-color: var(--header-bg);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header h1 {
+            font-size: 1rem;
+            font-weight: normal;
+        }
+
+        .system-info {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .header-button {
+            background-color: var(--button-bg);
+            color: var(--text-primary);
+            border: none;
+            padding: 0.25rem 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .header-button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .log-container {
+            padding: 0.5rem;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-header {
+            padding: 0.5rem;
+            background-color: var(--header-bg);
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            transition: background-color 0.3s;
+        }
+
+        .log-header h2 {
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        .log-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .log-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+        }
+
+        .log-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .log-view {
+            background-color: var(--log-bg);
+            border: 1px solid var(--border-color);
+            padding: 0;
+            height: 100%;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            transition: background-color 0.3s;
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .log-entry {
+            border-bottom: 1px solid rgba(60, 60, 60, 0.5);
+            transition: border-color 0.3s;
+        }
+
+        [data-theme="light"] .log-entry {
+            border-bottom: 1px solid rgba(200, 200, 200, 0.5);
+        }
+
+        .log-entry td {
+            padding: 0.3rem 0.5rem;
+            vertical-align: top;
+        }
+
+        .log-timestamp {
+            color: var(--timestamp-color);
+            width: 100px;
+            user-select: none;
+            transition: color 0.3s;
+        }
+
+        .log-type {
+            width: 80px;
+            text-align: center;
+            user-select: none;
+        }
+
+        .log-user {
+            color: var(--user-color);
+            transition: color 0.3s;
+        }
+
+        .log-bot {
+            color: var(--bot-color);
+            transition: color 0.3s;
+        }
+
+        .log-content {
+            word-break: break-word;
+        }
+
+        .log-line-number {
+            color: var(--text-secondary);
+            text-align: right;
+            padding-right: 1rem;
+            user-select: none;
+            width: 50px;
+            border-right: 1px solid var(--border-color);
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .log-status {
+            margin-top: auto;
+            padding: 0.3rem 0.5rem;
+            font-size: 0.8rem;
+            background-color: var(--header-bg);
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .log-filter {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            color: var(--text-secondary);
+            margin-right: 1rem;
+        }
+
+        .log-filter input {
+            background-color: var(--button-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.2rem 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            width: 150px;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .log-filter label {
+            font-size: 0.8rem;
+        }
+
+        .empty-log {
+            padding: 1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            text-align: center;
+            margin-top: 2rem;
+            transition: color 0.3s;
+        }
+
+        /* Theme toggle styles */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 1rem;
+        }
+
+        .theme-toggle-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--button-bg);
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--text-primary);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--bot-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .theme-icon {
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>SYSTEM LOG MONITOR</h1>
+        </div>
+        <div class="system-info">
+            <span>User: {{ muser.name }}</span>
+            <span>Role: Administrator</span>
+            <span>Session: #83AF26C</span>
+        </div>
+        <div class="header-right">
+            <div class="theme-toggle">
+                <span class="theme-icon"><i class="fas fa-moon"></i></span>
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="theme-icon"><i class="fas fa-sun"></i></span>
+            </div>
+            <div class="log-filter">
+                <label>Filter:</label>
+                <input type="text" placeholder="Search logs...">
+            </div>
+            <button class="header-button">
+                <i class="fas fa-tachometer-alt"></i> <a href="{% url 'analytical_charts' %}" style="text-decoration:none">DASHBOARD</a>
+            </button>
+            <button class="header-button">
+                <i class="fas fa-sign-out-alt"></i> LOGOUT
+            </button>
+        </div>
+    </header>
+
+    <div class="log-container">
+        <div class="log-header">
+            <h2>CHATBOT INTERACTION LOGS</h2>
+            <div class="log-controls">
+                <button class="log-btn"><i class="fas fa-sync"></i> REFRESH</button>
+            </div>
+        </div>
+
+        <div class="log-view">
+            <table class="log-table">
+                <tbody>
+                    {% for chat in chat_logs %}
+                        <tr class="log-entry">
+                            <td class="log-line-number">{{ forloop.counter }}</td>
+                            <td class="log-timestamp">{{ chat.timestamp|date:"Y-m-d" }} {{ chat.timestamp|time:"H:i:s" }}</td>
+                            <td class="log-type log-user">USER</td>
+                            <td class="log-content">{{ chat.user_name|default:"Guest" }}: {{ chat.user_query }}</td>
+                        </tr>
+                        <tr class="log-entry">
+                            <td class="log-line-number">{{ forloop.counter|add:"0.5"|floatformat:"0" }}</td>
+                            <td class="log-timestamp">{{ chat.timestamp|date:"Y-m-d" }} {{ chat.timestamp|time:"H:i:s" }}</td>
+                            <td class="log-type log-bot">BOT</td>
+                            <td class="log-content">{{ chat.bot_response }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="empty-log">
+                                [INFO] No log entries found. System waiting for new chat interactions.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="log-status">
+            <span>Total Entries: {{ chat_logs|length|default:"0" }}</span>
+            <span>Last Updated: {% now "Y-m-d H:i:s" %}</span>
+            <span>System Status: ONLINE</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logView = document.querySelector('.log-view');
+            logView.scrollTop = logView.scrollHeight;
+
+            // Add filter functionality
+            const filterInput = document.querySelector('.log-filter input');
+            filterInput.addEventListener('input', function() {
+                const filterText = this.value.toLowerCase();
+                const logEntries = document.querySelectorAll('.log-entry');
+
+                logEntries.forEach(entry => {
+                    const content = entry.querySelector('.log-content').textContent.toLowerCase();
+                    if (content.includes(filterText)) {
+                        entry.style.display = '';
+                    } else {
+                        entry.style.display = 'none';
+                    }
+                });
+            });
+
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('theme-toggle');
+
+            // Check for saved theme preference or use device preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.setAttribute('data-theme', 'light');
+                themeToggle.checked = true;
+            } else if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.checked = false;
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                document.body.setAttribute('data-theme', 'light');
+                themeToggle.checked = true;
+            }
+
+            // Theme toggle event listener
+            themeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

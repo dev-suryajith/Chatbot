@@ -1,0 +1,317 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Application Portal</title>
+    <link rel="stylesheet" href="{% static 'css/app-home.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .notification-container {
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #f8f4e3;
+    color: #8b0000;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    display: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.notification-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background-color: #8b0000;
+    border-radius: 50%;
+    display: none;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+.notification-panel {
+    position: absolute;
+    top: 40px;
+    right: -150px;
+    width: 300px;
+    background-color: #f8f4e3;
+    font-decoration: bold'
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 15px;
+    z-index: 100;
+    display: none;
+    border: 1px solid rgba(139, 0, 0, 0.1);
+}
+
+.notification-panel h3 {
+    margin-top: 0;
+    color: #8b0000;
+    border-bottom: 1px solid rgba(139, 0, 0, 0.2);
+    padding-bottom: 10px;
+    font-weight: 600;
+}
+
+.notification-item {
+    padding: 12px 10px;
+    border-bottom: 1px solid rgba(139, 0, 0, 0.1);
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.notification-item:hover {
+    background-color: rgba(139, 0, 0, 0.05);
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.notification-item.unread {
+    background-color: rgba(139, 0, 0, 0.08);
+    position: relative;
+}
+
+.notification-item.unread:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 70%;
+    background-color: #8b0000;
+    border-radius: 0 2px 2px 0;
+}
+
+.notification-content {
+    font-size: 14px;
+    margin-bottom: 5px;
+    color: #333;
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: #8b0000;
+    opacity: 0.8;
+}
+
+.notification-empty {
+    text-align: center;
+    padding: 20px 0;
+    color: #8b0000;
+    opacity: 0.6;
+    font-style: italic;
+}
+
+.mark-all-read {
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 10px;
+    background-color: rgba(139, 0, 0, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    color: #8b0000;
+    font-weight: 500;
+}
+
+.mark-all-read:hover {
+    background-color: rgba(139, 0, 0, 0.2);
+}
+
+/* Bell icon styling */
+.fa-bell {
+    color: #f8f4e3;
+    transition: transform 0.2s ease;
+}
+
+.notification-container:hover .fa-bell {
+    transform: rotate(10deg);
+}
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Prestige College</div>
+            <ul class="nav-links">
+                <li><a href="../">College Website</a></li>
+                <li><a href="../application_status">Application Status</a></li>
+                {% if not request.session.suser_name %}
+                    <li><a href="../signup">Sign Up!</a></li>
+                {% else %}
+                    <a style="font-size:16px"><li>{{ request.session.suser_name }}</a><br>
+                    <a href="../logout">Logout</a></li>
+                {% endif %}
+                <li class="notification-container">
+                    <i class="fa-solid fa-bell"></i>
+                    {% if notification %}
+                        <span class="notification-badge" id="notification-count"><b>*</b></span>
+                    {% elif notification %}
+                        <span class="notification-dot" id="notification-dot"></span>
+                    {% endif %}
+                    <div class="notification-panel" id="notification-panel">
+                        <h3>Notifications</h3>
+                        <div id="notification-list">
+                            {% if notification %}
+
+                                    <div class="notification-item {% if not notification.read %}unread{% endif %}">
+                                        <div class="notification-content">{{ reminder }}</div>
+<!--                                        <div class="notification-time">{{ notification.time }}</div>-->
+                                    </div>
+
+                            {% else %}
+                                <div class="notification-empty">No new notifications</div>
+                            {% endif %}
+                        </div>
+                        <div class="mark-all-read" id="mark-all-read">Mark all as read</div>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Prestige College Application Portal</h1>
+            <p>Manage your college application seamlessly and stay updated on your application status.</p><br>
+            {% if applied == True %}
+                <a href="../application_status/" class="apply-btn">Apply Now</a>
+            {% else %}
+                <a href="../application/" class="apply-btn">Apply Now</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 College Application Portal. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample notifications data - in production, this would come from your backend
+            let notifications = [
+                {% if request.session.suser_name %}
+                    // Only show notifications if user is logged in
+                    {% if applied == True %}
+                        {
+                            content: "Your application has been received. Check status for updates.",
+                            time: "2 hours ago",
+                            read: false
+                        },
+                        {
+                            content: "Remember to upload your transcript documents by the deadline.",
+                            time: "1 day ago",
+                            read: false
+                        }
+                    {% else %}
+                        {
+                            content: "Complete your application to Prestige College.",
+                            time: "Just now",
+                            read: false
+                        }
+                    {% endif %}
+                {% endif %}
+            ];
+
+            const notificationContainer = document.querySelector('.notification-container');
+            const notificationPanel = document.getElementById('notification-panel');
+            const notificationBadge = document.getElementById('notification-count');
+            const notificationDot = document.getElementById('notification-dot');
+            const notificationList = document.getElementById('notification-list');
+            const markAllRead = document.getElementById('mark-all-read');
+
+            // Function to update notifications display
+            function updateNotifications() {
+                // Count unread notifications
+                const unreadCount = notifications.filter(n => !n.read).length;
+
+                // Update badge and dot visibility
+                if (unreadCount > 0) {
+                    notificationBadge.textContent = unreadCount;
+                    notificationBadge.style.display = 'block';
+                    notificationDot.style.display = 'none'; // Use either badge or dot
+                } else {
+                    notificationBadge.style.display = 'none';
+                    notificationDot.style.display = 'none';
+                }
+
+                // Update notification list
+                notificationList.innerHTML = '';
+
+                if (notifications.length === 0) {
+                    notificationList.innerHTML = '<div class="notification-empty">No new notifications</div>';
+                } else {
+                    notifications.forEach((notification, index) => {
+                        const notificationItem = document.createElement('div');
+                        notificationItem.classList.add('notification-item');
+                        if (!notification.read) {
+                            notificationItem.style.backgroundColor = '#f0f8ff';
+                        }
+
+                        notificationItem.innerHTML = `
+                            <div class="notification-content">${notification.content}</div>
+                            <div class="notification-time">${notification.time}</div>
+                        `;
+
+                        notificationItem.addEventListener('click', function() {
+                            notifications[index].read = true;
+                            updateNotifications();
+                        });
+
+                        notificationList.appendChild(notificationItem);
+                    });
+                }
+            }
+
+            // Toggle notification panel
+            notificationContainer.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (notificationPanel.style.display === 'block') {
+                    notificationPanel.style.display = 'none';
+                } else {
+                    notificationPanel.style.display = 'block';
+                }
+            });
+
+            // Mark all as read
+            markAllRead.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notifications.forEach(notification => {
+                    notification.read = true;
+                });
+                updateNotifications();
+            });
+
+            // Close panel when clicking outside
+            document.addEventListener('click', function() {
+                notificationPanel.style.display = 'none';
+            });
+
+            // Prevent panel from closing when clicking inside it
+            notificationPanel.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // Initial update
+            updateNotifications();
+        });
+    </script>
+</body>
+</html>

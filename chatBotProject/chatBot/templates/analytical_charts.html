@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytical Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sky-blue-100: #e3f2fd;
+            --sky-blue-200: #bbdefb;
+            --sky-blue-300: #90caf9;
+            --sky-blue-400: #64b5f6;
+            --sky-blue-500: #42a5f5;
+            --sky-blue-600: #2196f3;
+            --sky-blue-700: #1e88e5;
+            --sky-blue-800: #1565c0;
+            --sky-blue-900: #0d47a1;
+        }
+
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+            border: none;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-card {
+            background: linear-gradient(145deg, white, #f8fafc);
+            border-left: 4px solid var(--sky-blue-600);
+        }
+
+        .metric-card h5 {
+            color: var(--sky-blue-800);
+            font-weight: 500;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-card h2 {
+            color: var(--sky-blue-700);
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            padding: 1rem;
+        }
+
+        .chart-card h5 {
+            color: var(--sky-blue-800);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--sky-blue-100);
+        }
+
+        .filters-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-label {
+            color: var(--sky-blue-800);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-select {
+            border-radius: 8px;
+            border: 1px solid #e0e7ff;
+            box-shadow: none;
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: var(--sky-blue-400);
+            box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.15);
+        }
+
+        .icon-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--sky-blue-100);
+            margin-bottom: 0.5rem;
+        }
+
+        .icon-container i {
+            color: var(--sky-blue-700);
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Professional 100% width header -->
+    <div class="header-container">
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="user-info">
+                    <h1>Application Management Dashboard</h1>
+                    <div class="user-details">
+                        <span class="user-name">{{ muser.name }}</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="user-meta">
+                        <span class="meta-item"><i class="icon-email"></i>{{ muser.email }}</span>
+                        <span class="meta-item"><i class="icon-phone"></i>{{ muser.phone_number }}</span>
+                    </div>
+                    <a href="{% url 'managementDashboard' %}" class="btn btn-logout">
+                        <i class="icon-logout"></i>Dashboard
+                    </a>
+                    <a href="{% url 'managementLogout' %}" class="btn btn-logout">
+                        <i class="icon-logout"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </header>
+        <br>
+    </div>
+
+    <div class="container">
+        <!-- Filters Section -->
+        <div class="filters-container">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="dateFilter" class="form-label">Date Range:</label>
+                    <select id="dateFilter" class="form-select">
+                        <option>None</option>
+                        <option>Today</option>
+                        <option>1 Week</option>
+                        <option>Last 30 days</option>
+                        <option>Last quarter</option>
+                        <option>Last year</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="courseFilter" class="form-label">Course:</label>
+                    <select id="courseFilter" class="form-select">
+                        <option>All Courses</option>
+                        <option>BCA</option>
+                        <option>BBA</option>
+                        <option>BCOM</option>
+                        <option>BA_ENG</option>
+                        <option>BSC_PHY</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="statusFilter" class="form-label">Status:</label>
+                    <select id="statusFilter" class="form-select">
+                        <option>All Statuses</option>
+                        <option>Accepted</option>
+                        <option>Rejected</option>
+                        <option>Pending</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics Section -->
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="card p-3 metric-card">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="icon-container">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h5>Total Applicants</h5>
+                        <h2>{{ total_applicants }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 metric-card">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="icon-container">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h5>Total Applications</h5>
+                        <h2>{{ total_applications }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 metric-card">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="icon-container">
+                            <i class="fas fa-user-minus"></i>
+                        </div>
+                        <h5>Drop-off Applicants</h5>
+                        <h2>{{ drop_off_applicants }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 metric-card">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="icon-container">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h5>Approval Rate</h5>
+                        <h2>{{ approval_rate }}%</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-3 chart-card">
+                    <h5><i class="fas fa-venus-mars me-2"></i>Applicants by Gender</h5>
+                    <div class="chart-container">
+                        <canvas id="genderChart"></canvas>
+                        <center>
+                            <button style="background: linear-gradient(to right, #87CEEB, #00BFFF);
+                                color: white;
+                                border: none;
+                                padding: 5px 10px;
+                                font-size: 12px;
+                                border-radius: 15px;
+                                cursor: pointer;
+                                transition: 0.3s;
+                                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+                            ">
+                                <a href="{% url 'viewApplicants' %}"
+                                   style="text-decoration: none; color: white; font-size: 12px;">
+                                   View Applicants
+                                </a>
+                            </button>
+
+                        </center>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 chart-card">
+                    <h5><i class="fas fa-clipboard-check me-2"></i>Application Status</h5>
+                    <div class="chart-container">
+                        <canvas id="statusChart"></canvas>
+                        <center>
+                            <button style="background: linear-gradient(to right, #87CEEB, #00BFFF);
+                                color: white;
+                                border: none;
+                                padding: 5px 10px;
+                                font-size: 12px;
+                                border-radius: 15px;
+                                cursor: pointer;
+                                transition: 0.3s;
+                                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+                            ">
+                                <a href="{% url 'managementDashboard' %}"
+                                   style="text-decoration: none; color: white; font-size: 12px;">
+                                   View Applications
+                                </a>
+                            </button>
+
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-3 chart-card">
+                    <h5><i class="fas fa-book me-2"></i>Course Preferences</h5>
+                    <div class="chart-container">
+                        <canvas id="courseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 chart-card">
+                    <h5><i class="fas fa-robot me-2"></i>Chatbot Query Frequency</h5>
+                    <div class="chart-container">
+                        <canvas id="chatbotChart"></canvas>
+                        <center>
+                            <button style="background: linear-gradient(to right, #87CEEB, #00BFFF);
+                                color: white;
+                                border: none;
+                                padding: 5px 10px;
+                                font-size: 12px;
+                                border-radius: 15px;
+                                cursor: pointer;
+                                transition: 0.3s;
+                                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+                            ">
+                                <a href="{% url 'chatLog' %}"
+                                   style="text-decoration: none; color: white; font-size: 12px;">
+                                   View ChatLogs
+                                </a>
+                            </button>
+
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drop-off Chart -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-3 chart-card">
+                    <h5><i class="fas fa-chart-pie me-2"></i>Drop-off Analysis</h5>
+                    <div class="chart-container">
+                        <canvas id="dropoffChart"></canvas>
+                        <center>
+                            <button style="background: linear-gradient(to right, #87CEEB, #00BFFF);
+                                color: white;
+                                border: none;
+                                padding: 5px 10px;
+                                font-size: 12px;
+                                border-radius: 15px;
+                                cursor: pointer;
+                                transition: 0.3s;
+                                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+                                text-decoration: none;
+                            ">
+                                 <a href="{% url 'dropOffList' %}"
+                                   style="text-decoration: none; color: white; font-size: 12px;">
+                                   View List
+                                </a>
+                            </button>
+
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function renderChart(chartId, dataJson, chartType) {
+            var ctx = document.getElementById(chartId).getContext('2d');
+            var chartData = JSON.parse(dataJson);
+
+            // Sky blue color scheme
+            var skyBlueColors = [
+                'rgba(224, 242, 254, 0.8)',  // sky-blue-100
+                'rgba(186, 230, 253, 0.8)',  // sky-blue-200
+                'rgba(125, 211, 252, 0.8)',  // sky-blue-300
+                'rgba(56, 189, 248, 0.8)',   // sky-blue-400
+                'rgba(14, 165, 233, 0.8)',   // sky-blue-500
+                'rgba(3, 105, 161, 0.8)'     // sky-blue-600
+            ];
+
+            if (chartType === 'pie' || chartType === 'doughnut') {
+                chartData.datasets[0].backgroundColor = skyBlueColors;
+                chartData.datasets[0].borderColor = skyBlueColors.map(color => color.replace('0.8', '1'));
+            } else if (chartType === 'bar') {
+                chartData.datasets[0].backgroundColor = skyBlueColors[3];
+                chartData.datasets[0].borderColor = skyBlueColors[5];
+            } else if (chartType === 'line') {
+                chartData.datasets[0].borderColor = skyBlueColors[4];
+                chartData.datasets[0].backgroundColor = skyBlueColors[2];
+                chartData.datasets[0].pointBackgroundColor = skyBlueColors[5];
+                chartData.datasets[0].pointBorderColor = '#fff';
+                chartData.datasets[0].tension = 0.3;
+            } else if (chartType === 'radar') {
+                chartData.datasets[0].backgroundColor = skyBlueColors[2];
+                chartData.datasets[0].borderColor = skyBlueColors[5];
+                chartData.datasets[0].pointBackgroundColor = skyBlueColors[5];
+                chartData.datasets[0].pointBorderColor = '#fff';
+            }
+
+            new Chart(ctx, {
+                type: chartType,
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            renderChart("genderChart", '{{ gender_data_json|escapejs }}', 'pie');
+            renderChart("statusChart", '{{ status_data_json|escapejs }}', 'bar');
+            renderChart("courseChart", '{{ course_data_json|escapejs }}', 'line');
+            renderChart("chatbotChart", '{{ chatbot_data_json|escapejs }}', 'radar');
+
+            // Drop-off Chart
+            var dropoffData = {
+                labels: ["Applied", "Drop-off"],
+                datasets: [{
+                    data: [{{ applicants_with_applications }}, {{ drop_off_applicants }}],
+                    backgroundColor: ["rgba(56, 189, 248, 0.8)", "rgba(3, 105, 161, 0.8)"]
+                }]
+            };
+            renderChart("dropoffChart", JSON.stringify(dropoffData), 'doughnut');
+        });
+
+        $("#dateFilter, #courseFilter, #statusFilter").change(function () {
+            window.location.href = "?date_range=" + $("#dateFilter").val() +
+                                   "&course=" + $("#courseFilter").val() +
+                                   "&status=" + $("#statusFilter").val();
+        });
+    </script>
+</body>
+</html>
